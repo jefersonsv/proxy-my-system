@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CompanyProxySetter.Internet
+namespace CompanyProxySetter.OperationalSystem
 {
     public class EnvironmentVariables
     {

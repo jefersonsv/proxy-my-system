@@ -1,5 +1,10 @@
-﻿using Config.Net;
+﻿using CompanyProxySetter.OperationalSystem;
+using Config.Net;
 using System;
+using System.Collections.Generic;
+using System.Security.Principal;
+using System.Linq;
+using System.IO;
 
 namespace CompanyProxySetter
 {
@@ -9,73 +14,135 @@ namespace CompanyProxySetter
 
         public static void Main(string[] args)
         {
+            if (!Windows.IsAdministrator())
+            {
+                logger.Error("You must run this with Administrator permission");
+                Environment.Exit(1);
+            }
+
             logger.Info("Getting profile");
             var userSettings = GettingProfileUserData();
+            if (userSettings == null)
+            {
+                logger.Error("You must set user data settings using any bellow methods:");
+                logger.Info("APP ARGUMENTS => aplication arguments");
+                logger.Info("APP SETTINGS => CompanyProxySetter.exe.config");
+                logger.Info("INI FILE => settings.ini");
+                logger.Info("JSON FILE => settings.json");
+                logger.Info("VARIABLE => environment variables");
+                logger.Info("The most important parameter is: PROXY_HOST then the first data settings that there are this value will be used");
+                Environment.Exit(2);
+            }
+            else
+            {
+                logger.Info("Starting process to configure proxy: " + userSettings.ProxyHost);
+            }
 
-            logger.Info("Starting process");
-
-            logger.Info("Clearing currenty configuration");
-            Internet.EnvironmentVariables.ClearHttpProxy(EnvironmentVariableTarget.Machine);
-            Internet.EnvironmentVariables.ClearHttpsProxy(EnvironmentVariableTarget.Machine);
-            Internet.LanSettings.ClearExceptions();
+            logger.Info("Clearing currently configuration");
+            EnvironmentVariables.ClearHttpProxy(EnvironmentVariableTarget.Machine);
+            EnvironmentVariables.ClearHttpsProxy(EnvironmentVariableTarget.Machine);
+            LanSettings.ClearExceptions();
 
             logger.Info("Setting profile");
             SettingUserData(userSettings);
+
+            Environment.Exit(0);
         }
 
         private static IUserData GettingProfileUserData()
         {
-            IUserData settings = new ConfigurationBuilder<IUserData>()
-               .UseCommandLineArgs()
-               .UseAppConfig()
-               .UseIniFile(@".\App.ini")
-               .UseJsonFile(@".\App.json")
-               .UseEnvironmentVariables()
-               .Build();
+            List<IUserData> settings = new List<IUserData>();
+            settings.Add(new ConfigurationBuilder<IUserData>().UseCommandLineArgs().Build());
+            settings.Add(new ConfigurationBuilder<IUserData>().UseAppConfig().Build());
+            settings.Add(new ConfigurationBuilder<IUserData>().UseIniFile(System.IO.Path.Combine(Environment.CurrentDirectory, "settings.ini")).Build());
+            settings.Add(new ConfigurationBuilder<IUserData>().UseJsonFile(System.IO.Path.Combine(Environment.CurrentDirectory, "settings.json")).Build());
+            settings.Add(new ConfigurationBuilder<IUserData>().UseEnvironmentVariables().Build());
 
-            return settings;
+            return settings.FirstOrDefault(w => !string.IsNullOrEmpty(w.ProxyHost));
         }
 
         private static void SettingUserData(IUserData userData)
         {
             var passwordEncoded = System.Web.HttpUtility.UrlEncode(userData.ProxyPassword ?? string.Empty);
 
-            //Log.Info("Setando proxy no painel de controle");
-            //Internet.LanSettings.SetProxy($"{PROXY_HOST}:{PROXY_PORT}");
-            //Log.Info("Setando proxy na variavel de ambiente HTTP_PROXY");
-            //ProxyManager.Internet.EnvironmentVariables.SetHttpProxy($"http://{USERNAME}:{PASSWORD_ENCODED}@{PROXY_HOST}:{PROXY_PORT}", EnvironmentVariableTarget.User);
-            //Log.Info("Setando proxy na variavel de ambiente HTTPS_PROXY");
-            //ProxyManager.Internet.EnvironmentVariables.SetHttpsProxy($"http://{USERNAME}:{PASSWORD_ENCODED}@{PROXY_HOST}:{PROXY_PORT}", EnvironmentVariableTarget.User);
+            // Configure control panel
+            logger.Info("Setting control panel");
+            LanSettings.SetProxy($"{userData.ProxyHost}:{userData.ProxyPort}");
+            LanSettings.ClearExceptions();
+            if (!string.IsNullOrEmpty(userData.ProxyExceptions))
+            {
+                LanSettings.AddExceptions($"{userData.ProxyExceptions}");
+            }
+            LanSettings.SetExceptionForLocal(true);
 
-            //// Configurar GIT
-            //Log.Info("Limpando variavel http.proxy no git config");
-            //Dev.Essential.MsDos.ExecuteProgram.ExecuteAndWait("git", "config --global http.proxy \"\"", null, true);
-            ///*
-            //Log.Information("Removendo variavel http.proxy no git config");
-            //Dev.Essential.MsDos.ExecuteProgram.ExecuteAndWait("git", "config --global --unset http.proxy", null, true);
-            //Log.Information("Removendo variavel https.proxy no git config");
-            //Dev.Essential.MsDos.ExecuteProgram.ExecuteAndWait("git", "config --global --unset https.proxy", null, true);
-            //*/
+            // Configure environment variables
+            logger.Info("Setting environment variable HTTP_PROXY and HTTPS_PROXY for current user");
+            logger.Info("A lot of applications such as: Ruby Gem, Ionic, Cordova, etc will be work with this configuration");
+            EnvironmentVariables.SetHttpProxy($"http://{userData.ProxyUsername}:{passwordEncoded}@{userData.ProxyHost}:{userData.ProxyPort}", EnvironmentVariableTarget.User);
+            EnvironmentVariables.SetHttpsProxy($"http://{userData.ProxyUsername}:{passwordEncoded}@{userData.ProxyHost}:{userData.ProxyPort}", EnvironmentVariableTarget.User);
 
-            //// Configurar CHOCOLATEY
-            //Log.Info("Setando proxy no chocolatey");
-            //Dev.Essential.MsDos.ExecuteProgram.ExecuteAndWait("choco", $@"config set proxy http://{PROXY_HOST}:{PROXY_PORT}", null, true);
-            //Log.Info("Setando usuario de proxy no chocolatey");
-            //Dev.Essential.MsDos.ExecuteProgram.ExecuteAndWait("choco", $@"config set proxyUser {PASSWORD}\{USERNAME}", null, true);
-            //Log.Info("Setando senha do usuario de proxy no chocolatey");
-            //Dev.Essential.MsDos.ExecuteProgram.ExecuteAndWait("choco", $@"config set proxyPassword {PASSWORD}", null, true);
-            //Log.Info("Setando a lista de bypass no chocolatey");
-            //Dev.Essential.MsDos.ExecuteProgram.ExecuteAndWait("choco", $@"config set proxyBypassList ""{PROXY_EXCEPTIONS}""", null, true);
-            //Log.Info("Setando o bypass localhost na lista de bypass");
-            //Dev.Essential.MsDos.ExecuteProgram.ExecuteAndWait("choco", $@"config set proxyBypassOnLocal true", null, true);
+            // Configure GIT
+            if (Msdos.IsInstalled("git"))
+            {
+                logger.Info("Setting proxy for GIT");
+                Msdos.Run("git", $"config --global http.proxy http://{userData.ProxyUsername}:{passwordEncoded}@{userData.ProxyHost}:{userData.ProxyPort}");
+            }
 
-            //// Configurar Nuget (Browse package pelo VS e também no DOS)
-            //Log.Info("Setando proxy no nuget");
-            //Dev.Essential.MsDos.ExecuteProgram.ExecuteAndWait("nuget", $@"config -set http_proxy=http://{PROXY_HOST}:{PROXY_PORT}", null, true);
-            //Log.Info("Setando usuario de proxy no nuget");
-            //Dev.Essential.MsDos.ExecuteProgram.ExecuteAndWait("nuget", $@"config -set http_proxy.user={DOMAIN}\{USERNAME}", null, true);
-            //Log.Info("Setando senha do usuario de proxy no nuget");
-            //Dev.Essential.MsDos.ExecuteProgram.ExecuteAndWait("nuget", $@"config -set http_proxy.password={PASSWORD}", null, true);
+            // Configure CHOCOLATEY
+            if (Msdos.IsInstalled("choco"))
+            {
+                logger.Info("Setting proxy for chocolatey");
+                Msdos.Run("choco", $@"config set proxy http://{userData.ProxyHost}:{userData.ProxyPort}");
+                Msdos.Run("choco", $@"config set proxyUser {userData.ProxyDomain}\{userData.ProxyUsername}");
+                Msdos.Run("choco", $@"config set proxyPassword {userData.ProxyPassword}");
+                Msdos.Run("choco", $@"config set proxyBypassList ""{userData.ProxyExceptions}");
+                Msdos.Run("choco", $@"config set proxyBypassOnLocal true");
+            }
+
+            // Configure nuget
+            if (Msdos.IsInstalled("nuget"))
+            {
+                logger.Info("Setting proxy for nuget");
+                Msdos.Run("nuget", $@"config -set http_proxy=http://{userData.ProxyHost}:{userData.ProxyPort}");
+                Msdos.Run("nuget", $@"config -set http_proxy.user={userData.ProxyDomain}\{userData.ProxyUsername}");
+                Msdos.Run("nuget", $@"config -set http_proxy.password={userData.ProxyPassword}");
+            }
+
+            // Configure npm
+            if (Msdos.IsInstalled("npm"))
+            {
+                logger.Info("Setting proxy for npm");
+                Msdos.Run("npm", $@"npm config set proxy http://{userData.ProxyUsername}:{userData.ProxyPassword}@{userData.ProxyHost}:{userData.ProxyPort}");
+                Msdos.Run("npm", $@"npm config set https-proxy http://{userData.ProxyUsername}:{userData.ProxyPassword}@{userData.ProxyHost}:{userData.ProxyPort}");
+            }
+
+            // Configure npm
+            if (Msdos.IsInstalled("npm"))
+            {
+                logger.Info("Setting proxy for npm");
+                Msdos.Run("npm", $@"npm config set proxy http://{userData.ProxyUsername}:{userData.ProxyPassword}@{userData.ProxyHost}:{userData.ProxyPort}");
+                Msdos.Run("npm", $@"npm config set https-proxy http://{userData.ProxyUsername}:{userData.ProxyPassword}@{userData.ProxyHost}:{userData.ProxyPort}");
+            }
+
+            // Configure bower
+            if (Msdos.IsInstalled("bower"))
+            {
+                logger.Info("Setting proxy for bower");
+                Msdos.Run("npm", $@"npm config set proxy http://{userData.ProxyUsername}:{userData.ProxyPassword}@{userData.ProxyHost}:{userData.ProxyPort}");
+                Msdos.Run("npm", $@"npm config set https-proxy http://{userData.ProxyUsername}:{userData.ProxyPassword}@{userData.ProxyHost}:{userData.ProxyPort}");
+            }
+
+            // Configure android sdk
+            var androidSdkPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".android");
+            if (Directory.Exists(androidSdkPath))
+            {
+                logger.Info("Setting proxy for Android SDK");
+
+                //http.proxyHost =[Your Proxy]
+                //http.proxyPort =[Proxy Port]
+
+                File.WriteAllText(Path.Combine(androidSdkPath, "androidtool.cfg"), "teste");
+            }
         }
     }
 }
