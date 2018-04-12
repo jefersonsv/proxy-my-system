@@ -16,6 +16,7 @@ Configure easily a big list of applications
 * Ionic - https://ionicframework.com
 * Cordova - https://cordova.apache.org
 * Android SDK - https://developer.android.com/studio
+* Visual Studio - https://www.visualstudio.com
 * All browsers - https://en.wikipedia.org/wiki/List_of_web_browsers
 * And much more
 
