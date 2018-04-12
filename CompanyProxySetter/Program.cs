@@ -102,6 +102,14 @@ namespace CompanyProxySetter
                 Msdos.Run("choco", $@"config set proxyBypassOnLocal true");
             }
 
+            // Configure yarn
+            if (Msdos.IsInstalled("yarn"))
+            {
+                logger.Info("Setting proxy for yarn");
+                Msdos.Run("yarn", $@"npm config set proxy http://{userData.ProxyUsername}:{userData.ProxyPassword}@{userData.ProxyHost}:{userData.ProxyPort}");
+                Msdos.Run("yarn", $@"npm config set https-proxy http://{userData.ProxyUsername}:{userData.ProxyPassword}@{userData.ProxyHost}:{userData.ProxyPort}");
+            }
+
             // Configure nuget
             if (Msdos.IsInstalled("nuget"))
             {
@@ -109,14 +117,6 @@ namespace CompanyProxySetter
                 Msdos.Run("nuget", $@"config -set http_proxy=http://{userData.ProxyHost}:{userData.ProxyPort}");
                 Msdos.Run("nuget", $@"config -set http_proxy.user={userData.ProxyDomain}\{userData.ProxyUsername}");
                 Msdos.Run("nuget", $@"config -set http_proxy.password={userData.ProxyPassword}");
-            }
-
-            // Configure npm
-            if (Msdos.IsInstalled("npm"))
-            {
-                logger.Info("Setting proxy for npm");
-                Msdos.Run("npm", $@"npm config set proxy http://{userData.ProxyUsername}:{userData.ProxyPassword}@{userData.ProxyHost}:{userData.ProxyPort}");
-                Msdos.Run("npm", $@"npm config set https-proxy http://{userData.ProxyUsername}:{userData.ProxyPassword}@{userData.ProxyHost}:{userData.ProxyPort}");
             }
 
             // Configure npm
