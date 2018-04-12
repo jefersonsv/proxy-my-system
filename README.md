@@ -64,34 +64,34 @@ run.cmd
 ### INI file
 1. Open the file settings.ini
 2. Fill the follow the variables
-   1. PROXY_DOMAIN
-   2. PROXY_USERNAME
-   3. PROXY_PASSWORD
-   4. PROXY_HOST
-   5. PROXY_PORT
-   6. PROXY_EXCEPTIONS
+    * PROXY_DOMAIN
+    * PROXY_USERNAME
+    * PROXY_PASSWORD
+    * PROXY_HOST
+    * PROXY_PORT
+    * PROXY_EXCEPTIONS
 3. Run the application `CompanyProxySetter.exe`
 
 ### Json file
 1. Open the file settings.json
 2. Fill the follow the variables
-   1. PROXY_DOMAIN
-   2. PROXY_USERNAME
-   3. PROXY_PASSWORD
-   4. PROXY_HOST
-   5. PROXY_PORT
-   6. PROXY_EXCEPTIONS
+    * PROXY_DOMAIN
+    * PROXY_USERNAME
+    * PROXY_PASSWORD
+    * PROXY_HOST
+    * PROXY_PORT
+    * PROXY_EXCEPTIONS
 3. Run the application `CompanyProxySetter.exe`
 
 ### XML configuration file
 1. Open the file CompanyProxySetter.exe.config
 2. Fill the follow the variables at appSettings section
-   1. PROXY_DOMAIN
-   2. PROXY_USERNAME
-   3. PROXY_PASSWORD
-   4. PROXY_HOST
-   5. PROXY_PORT
-   6. PROXY_EXCEPTIONS
+    * PROXY_DOMAIN
+    * PROXY_USERNAME
+    * PROXY_PASSWORD
+    * PROXY_HOST
+    * PROXY_PORT
+    * PROXY_EXCEPTIONS
 3. Run the application `CompanyProxySetter.exe`
 
 ## Releases
