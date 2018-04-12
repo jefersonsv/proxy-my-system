@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Security.Principal;
 using System.Linq;
 using System.IO;
+using System.Text;
 
 namespace CompanyProxySetter
 {
@@ -45,6 +46,8 @@ namespace CompanyProxySetter
 
             logger.Info("Setting profile");
             SettingUserData(userSettings);
+
+            logger.Info("The system has been configured");
 
             Environment.Exit(0);
         }
@@ -137,12 +140,36 @@ namespace CompanyProxySetter
             if (Directory.Exists(androidSdkPath))
             {
                 logger.Info("Setting proxy for Android SDK");
-
-                //http.proxyHost =[Your Proxy]
-                //http.proxyPort =[Proxy Port]
-
-                File.WriteAllText(Path.Combine(androidSdkPath, "androidtool.cfg"), "teste");
+                File.WriteAllText(Path.Combine(androidSdkPath, "androidtool.cfg"), RenderConfigFileAndroidSdk(userData));
             }
+
+            // Configure gradle
+            if (Msdos.IsInstalled("gradle"))
+            {
+                var gradlePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile));
+                logger.Info("Setting proxy for gradle");
+                File.WriteAllText(Path.Combine(gradlePath, ".gradle.properties"), RenderConfigFileGradle(userData));
+            }
+        }
+
+        private static string RenderConfigFileGradle(IUserData userData)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"systemProp.http.proxyHost=={userData.ProxyHost}");
+            sb.AppendLine($"systemProp.http.proxyPort={userData.ProxyPort}");
+            sb.AppendLine($"systemProp.http.nonProxyHosts={userData.ProxyExceptions}");
+            sb.AppendLine($"systemProp.https.proxyHost=={userData.ProxyHost}");
+            sb.AppendLine($"systemProp.https.proxyPort={userData.ProxyPort}");
+            sb.AppendLine($"systemProp.https.nonProxyHosts={userData.ProxyExceptions}");
+            return sb.ToString();
+        }
+
+        private static string RenderConfigFileAndroidSdk(IUserData userData)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"http.proxyHost={userData.ProxyHost}");
+            sb.AppendLine($"http.proxyPort={userData.ProxyPort}");
+            return sb.ToString();
         }
     }
 }
