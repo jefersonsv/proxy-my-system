@@ -20,6 +20,9 @@ Configure easily a big list of applications
 * All browsers - https://en.wikipedia.org/wiki/List_of_web_browsers
 * And much more
 
+## Future implementation
+* Add Visual studio code configuration
+
 ## Behavior
 
 > Only the variable **PROXY_HOST** and **PROXY_PORT** are required the others varibles are optional.
