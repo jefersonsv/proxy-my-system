@@ -1,4 +1,5 @@
 ﻿using CliWrap;
+using CliWrap.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,8 @@ namespace CompanyProxySetter.OperationalSystem
 {
     public static class Msdos
     {
+        public static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
+
         public static bool IsInstalled(string app)
         {
             try
@@ -25,11 +28,11 @@ namespace CompanyProxySetter.OperationalSystem
             }
         }
 
-        public static void Run(string app, string param)
+        public static ExecutionOutput Run(string app, string param)
         {
             using (var cli = new Cli(app))
             {
-                cli.ExecuteAndForget(param);
+                return cli.Execute(param);
             }
         }
     }

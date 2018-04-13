@@ -6,6 +6,7 @@ using System.Security.Principal;
 using System.Linq;
 using System.IO;
 using System.Text;
+using CredentialManagement;
 
 namespace CompanyProxySetter
 {
@@ -77,6 +78,21 @@ namespace CompanyProxySetter
                 LanSettings.AddExceptions($"{userData.ProxyExceptions}");
             }
             LanSettings.SetExceptionForLocal(true);
+
+            // Configure Windows and Generic credentials
+            using (var credentials = new Credential())
+            {
+                logger.Info("Setting Windows and Generic credentials");
+                credentials.Password = userData.ProxyPassword;
+                credentials.Target = $"http://{userData.ProxyHost}:{userData.ProxyPort}";
+                credentials.Username = userData.ProxyUsername;
+                credentials.PersistanceType = PersistanceType.LocalComputer;
+                credentials.Type = CredentialType.Generic;
+                credentials.Save();
+
+                credentials.Type = CredentialType.DomainPassword;
+                credentials.Save();
+            }
 
             // Configure environment variables
             logger.Info("Setting environment variable HTTP_PROXY and HTTPS_PROXY for current user");
@@ -150,6 +166,25 @@ namespace CompanyProxySetter
                 logger.Info("Setting proxy for gradle");
                 File.WriteAllText(Path.Combine(gradlePath, ".gradle.properties"), RenderConfigFileGradle(userData));
             }
+
+            // Configure cntlm on localhost
+            //var cntlmPath = Path.Combine(Environment.CurrentDirectory, "Lib", "cntlm-0.92.3");
+            //var cntlmFiles = Directory.GetFiles(cntlmPath);
+            //if (cntlmFiles.Contains(Path.Combine(cntlmPath, "cygrunsrv.exe")) && cntlmFiles.Contains(Path.Combine(cntlmPath, "cntlm.exe")))
+            //{
+            //    logger.Info("Setting cntlm on localhost");
+
+            //    var existService = Msdos.Run(Path.Combine(cntlmPath, "cygrunsrv"), $@"--query cntlm");
+            //    if (!existService.StandardError.Contains("The specified service does not exist as an installed service"))
+            //    {
+            //        // remove cntlm
+            //        var remove = Msdos.Run(Path.Combine(cntlmPath, "cygrunsrv"), $@"--remove cntlm");
+            //    }
+
+            //    // Install
+            //    var result = Msdos.Run(Path.Combine(cntlmPath, "cygrunsrv"), $@"--install cntlm --path {Path.Combine(cntlmPath, "cntlm.exe")}");
+            //    var start = Msdos.Run(Path.Combine(cntlmPath, "cygrunsrv"), $@"--start cntlm");
+            //}
         }
 
         private static string RenderConfigFileGradle(IUserData userData)
