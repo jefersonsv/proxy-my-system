@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CompanyProxySetter.OperationalSystem
+namespace ProxyAtWork.OperationalSystem
 {
     public static class Msdos
     {

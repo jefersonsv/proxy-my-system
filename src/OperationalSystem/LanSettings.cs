@@ -3,7 +3,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
-namespace CompanyProxySetter.OperationalSystem
+namespace ProxyAtWork.OperationalSystem
 {
     /// <summary>
     /// https://stackoverflow.com/questions/197725/programmatically-set-browser-proxy-settings-in-c-sharp

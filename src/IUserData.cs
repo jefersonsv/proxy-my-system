@@ -1,6 +1,6 @@
 ﻿using Config.Net;
 
-namespace CompanyProxySetter
+namespace ProxyAtWork
 {
     public interface IUserData
     {
@@ -22,4 +22,3 @@ namespace CompanyProxySetter
         [Option(Alias = "PROXY_USERNAME")]
         string ProxyUsername { get; }
     }
-}

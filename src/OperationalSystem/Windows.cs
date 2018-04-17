@@ -5,7 +5,7 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CompanyProxySetter.OperationalSystem
+namespace ProxyAtWork.OperationalSystem
 {
     public static class Windows
     {
