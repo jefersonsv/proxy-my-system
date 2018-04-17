@@ -22,3 +22,4 @@ namespace ProxyAtWork
         [Option(Alias = "PROXY_USERNAME")]
         string ProxyUsername { get; }
     }
+}

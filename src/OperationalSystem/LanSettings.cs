@@ -37,7 +37,11 @@ namespace ProxyAtWork.OperationalSystem
 
         public static string GetExceptions()
         {
-            return proxyRegistry.GetValue("ProxyOverride").ToString();
+            var except = proxyRegistry.GetValue("ProxyOverride");
+            if (except != null)
+                return except.ToString();
+
+            return null;
         }
 
         [DllImport("wininet.dll")]

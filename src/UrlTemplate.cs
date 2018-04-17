@@ -2,8 +2,12 @@
 {
     public class UrlTemplate
     {
-        public UrlTemplate(IUserData userData)
+        public UrlTemplate(IUserData userData, bool clear)
         {
+            this.ClearData = clear;
+            if (userData == null)
+                return;
+
             var passwordEncoded = System.Web.HttpUtility.UrlEncode(userData.ProxyPassword ?? string.Empty);
             this.HttpProxyEncodedPassword = $"http://{userData.ProxyUsername}:{passwordEncoded}@{userData.ProxyHost}:{userData.ProxyPort}";
             this.HttpsProxyEncodedPassword = $"https://{userData.ProxyUsername}:{passwordEncoded}@{userData.ProxyHost}:{userData.ProxyPort}";
@@ -14,6 +18,7 @@
             this.UserData = userData;
         }
 
+        public bool ClearData { get; }
         public string HttpProxy { get; }
         public string HttpProxyEncodedPassword { get; }
         public string HttpProxyNormalPassword { get; }
