@@ -38,8 +38,8 @@ namespace ProxyAtWork
                     logger.Error("You must set user data settings using any bellow methods:");
                     logger.Info("APP ARGUMENTS => aplication arguments");
                     logger.Info("APP SETTINGS => ProxyAtWork.exe.config");
-                    logger.Info("INI FILE => settings.ini");
-                    logger.Info("JSON FILE => settings.json");
+                    logger.Info("INI FILE => ProxyAtWork.ini");
+                    logger.Info("JSON FILE => ProxyAtWork.json");
                     logger.Info("VARIABLE => environment variables");
                     logger.Info("The most important parameter is: PROXY_HOST then the first data settings that there are this value will be used");
                     Environment.Exit(2);
@@ -408,8 +408,8 @@ namespace ProxyAtWork
             List<IUserData> settings = new List<IUserData>();
             settings.Add(new ConfigurationBuilder<IUserData>().UseCommandLineArgs().Build());
             settings.Add(new ConfigurationBuilder<IUserData>().UseAppConfig().Build());
-            settings.Add(new ConfigurationBuilder<IUserData>().UseIniFile(System.IO.Path.Combine(Environment.CurrentDirectory, "settings.ini")).Build());
-            settings.Add(new ConfigurationBuilder<IUserData>().UseJsonFile(System.IO.Path.Combine(Environment.CurrentDirectory, "settings.json")).Build());
+            settings.Add(new ConfigurationBuilder<IUserData>().UseIniFile(System.IO.Path.Combine(Environment.CurrentDirectory, "ProxyAtWork.ini")).Build());
+            settings.Add(new ConfigurationBuilder<IUserData>().UseJsonFile(System.IO.Path.Combine(Environment.CurrentDirectory, "ProxyAtWork.json")).Build());
             settings.Add(new ConfigurationBuilder<IUserData>().UseEnvironmentVariables().Build());
 
             return settings.FirstOrDefault(w => !string.IsNullOrEmpty(w.ProxyHost));
