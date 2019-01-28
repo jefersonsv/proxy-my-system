@@ -1,6 +1,7 @@
 ﻿using CommandLineParser.Arguments;
 using Config.Net;
 using CredentialManagement;
+using Newtonsoft.Json.Linq;
 using ProxyAtWork.OperationalSystem;
 using System;
 using System.Collections.Generic;
@@ -58,11 +59,11 @@ namespace ProxyAtWork
             ConfigInternetSettings(urlTemplate);
             ConfigWindowsCredential(urlTemplate);
             ConfigEnvironmentVariable(urlTemplate);
+            ConfigNpm(urlTemplate);
             ConfigGit(urlTemplate);
             ConfigChocolatey(urlTemplate);
-            ConfigYarn(urlTemplate);
+            //ConfigYarn(urlTemplate);
             ConfigNuget(urlTemplate);
-            ConfigNpm(urlTemplate);
             ConfigBower(urlTemplate);
             ConfigAndroidSdk(urlTemplate);
             ConfigGradle(urlTemplate);
@@ -108,15 +109,19 @@ namespace ProxyAtWork
             {
                 if (urlTemplate.ClearData)
                 {
-                    logger.Warn("Not implemented clearing proxy for android sdk");
+                    logger.Info("Clearing proxy for Android SDK");
+                    if (File.Exists(Path.Combine(androidSdkPath, "androidtool.cfg")))
+                    {
+                        File.Delete(Path.Combine(androidSdkPath, "androidtool.cfg"));
+                    }
                 }
                 else
                 {
                     logger.Info("Setting proxy for Android SDK");
 
                     StringBuilder sb = new StringBuilder();
-                    sb.AppendLine($"http.proxyHost={urlTemplate.UserData.ProxyHost}");
-                    sb.AppendLine($"http.proxyPort={urlTemplate.UserData.ProxyPort}");
+                    sb.AppendLine($"http.proxyHost={urlTemplate.GetHost()}");
+                    sb.AppendLine($"http.proxyPort={urlTemplate.GetPort()}");
 
                     File.WriteAllText(Path.Combine(androidSdkPath, "androidtool.cfg"), sb.ToString());
                 }
@@ -126,17 +131,41 @@ namespace ProxyAtWork
         private static void ConfigBower(UrlTemplate urlTemplate)
         {
             // Configure bower
-            if (Msdos.IsInstalled("bower"))
+            if (Msdos.IsInstalled("bower.cmd"))
             {
                 if (urlTemplate.ClearData)
                 {
-                    logger.Warn("Not implemented clearing proxy for bower");
+                    logger.Info("Clearing proxy for bower");
+                    Msdos.Run("npm.cmd", $@"config delete proxy");
+                    Msdos.Run("npm.cmd", $@"config delete https-proxy");
                 }
                 else
                 {
                     logger.Info("Setting proxy for bower");
-                    Msdos.Run("npm", $@"npm config set proxy {urlTemplate.HttpProxy}");
-                    Msdos.Run("npm", $@"npm config set https-proxy {urlTemplate.HttpsProxy}");
+                    Msdos.Run("npm.cmd", $@"npm config set proxy {urlTemplate.GetProxy()}");
+                    Msdos.Run("npm.cmd", $@"npm config set https-proxy {urlTemplate.GetProxySsl()}");
+
+                    // Create bowerrc file
+                    var bowerrc = Path.Combine(Windows.GetCurrentUserFolder(), ".bowerrc");
+                    if (!File.Exists(bowerrc))
+                    {
+                        // create settings
+                        var obj = new JObject();
+                        obj.Add("proxy", urlTemplate.GetProxy());
+                        obj.Add("https-proxy", urlTemplate.GetProxySsl());
+
+                        System.IO.File.WriteAllText(bowerrc, obj.ToString());
+                    }
+                    else
+                    {
+                        // update settings
+                        var content = System.IO.File.ReadAllText(bowerrc);
+                        var obj = JObject.Parse(content);
+                        obj["proxy"] = urlTemplate.GetProxy();
+                        obj["https-proxy"] = urlTemplate.GetProxySsl();
+
+                        System.IO.File.WriteAllText(bowerrc, obj.ToString());
+                    }
                 }
             }
         }
@@ -144,20 +173,32 @@ namespace ProxyAtWork
         private static void ConfigChocolatey(UrlTemplate urlTemplate)
         {
             // Configure CHOCOLATEY
-            if (Msdos.IsInstalled("choco"))
+            if (Msdos.IsInstalled("choco.exe"))
             {
                 if (urlTemplate.ClearData)
                 {
-                    logger.Warn("Not implemented clearing proxy for chocolatey");
+                    logger.Info("Clearing proxy for chocolatey");
+                    Msdos.Run("choco.exe", $@"config unset proxy");
+                    Msdos.Run("choco.exe", $@"config unset proxyUser");
+                    Msdos.Run("choco.exe", $@"config unset proxyPassword");
+                    Msdos.Run("choco.exe", $@"config unset proxyBypassList");
+                    Msdos.Run("choco.exe", $@"config unset proxyBypassOnLocal");
                 }
                 else
                 {
                     logger.Info("Setting proxy for chocolatey");
-                    Msdos.Run("choco", $@"config set proxy {urlTemplate.HttpProxy}");
-                    Msdos.Run("choco", $@"config set proxyUser {urlTemplate.UserData.ProxyDomain}\{urlTemplate.UserData.ProxyUsername}");
-                    Msdos.Run("choco", $@"config set proxyPassword {urlTemplate.UserData.ProxyPassword}");
-                    Msdos.Run("choco", $@"config set proxyBypassList ""{urlTemplate.UserData.ProxyExceptions}");
-                    Msdos.Run("choco", $@"config set proxyBypassOnLocal true");
+                    Msdos.Run("choco.exe", $@"config set proxy {urlTemplate.GetProxy()}");
+
+                    if (!string.IsNullOrEmpty(urlTemplate.GetProxyUsername()))
+                        Msdos.Run("choco.exe", $@"config set proxyUser {urlTemplate.GetProxyUsername()}");
+
+                    if (!string.IsNullOrEmpty(urlTemplate.GetProxyPassword()))
+                        Msdos.Run("choco.exe", $@"config set proxyPassword {urlTemplate.GetProxyPassword()}");
+
+                    if (!string.IsNullOrEmpty(urlTemplate.GetProxyExceptions()))
+                        Msdos.Run("choco.exe", $@"config set proxyBypassList ""{urlTemplate.GetProxyExceptions()}");
+
+                    Msdos.Run("choco.exe", $@"config set proxyBypassOnLocal true");
                 }
             }
         }
@@ -177,13 +218,13 @@ namespace ProxyAtWork
                 logger.Info("A lot of applications such as: Ruby Gem, Ionic, Cordova, etc will be work with this configuration");
                 if (urlTemplate.MustBeAuthenticated)
                 {
-                    EnvironmentVariables.SetHttpProxy(urlTemplate.HttpProxyEncodedPassword, EnvironmentVariableTarget.User);
-                    EnvironmentVariables.SetHttpsProxy(urlTemplate.HttpProxyEncodedPassword, EnvironmentVariableTarget.User);
+                    EnvironmentVariables.SetHttpProxy(urlTemplate.GetProxy(), EnvironmentVariableTarget.User);
+                    EnvironmentVariables.SetHttpsProxy(urlTemplate.GetProxySsl(), EnvironmentVariableTarget.User);
                 }
                 else
                 {
-                    EnvironmentVariables.SetHttpProxy(urlTemplate.HttpProxy, EnvironmentVariableTarget.User);
-                    EnvironmentVariables.SetHttpsProxy(urlTemplate.HttpProxy, EnvironmentVariableTarget.User);
+                    EnvironmentVariables.SetHttpProxy(urlTemplate.GetProxy(), EnvironmentVariableTarget.User);
+                    EnvironmentVariables.SetHttpsProxy(urlTemplate.GetProxySsl(), EnvironmentVariableTarget.User);
                 }
             }
         }
@@ -191,19 +232,18 @@ namespace ProxyAtWork
         private static void ConfigGit(UrlTemplate urlTemplate)
         {
             // Configure GIT
-            if (Msdos.IsInstalled("git"))
+            if (Msdos.IsInstalled("git.exe"))
             {
                 if (urlTemplate.ClearData)
                 {
                     logger.Info("Clearing proxy for GIT");
-                    Msdos.Run("git", $"config --global http.proxy \"\"");
-                    Msdos.Run(@"git", $"config --global no.proxy");
+                    Msdos.Run("git.exe", $"config --global --unset http.proxy");
                 }
                 else
                 {
                     logger.Info("Setting proxy for GIT");
-                    Msdos.Run("git", $"config --global http.proxy {urlTemplate.HttpProxyEncodedPassword}");
-                    Msdos.Run("git", $"config --global no.proxy {urlTemplate.UserData.ProxyExceptions}");
+                    Msdos.Run("git.exe", $"config --global http.proxy {urlTemplate.GetProxy()}");
+                    Msdos.Run("git.exe", $"config --global https.proxy {urlTemplate.GetProxySsl()}");
                 }
             }
         }
@@ -217,19 +257,21 @@ namespace ProxyAtWork
 
                 if (urlTemplate.ClearData)
                 {
-                    logger.Warn("Not implemented clearing proxy for gradle");
+                    logger.Info("Clearing proxy for gradle");
+                    StringBuilder sb = new StringBuilder();
+                    File.WriteAllText(Path.Combine(gradlePath, ".gradle.properties"), sb.ToString());
                 }
                 else
                 {
                     logger.Info("Setting proxy for gradle");
 
                     StringBuilder sb = new StringBuilder();
-                    sb.AppendLine($"systemProp.http.proxyHost=={urlTemplate.UserData.ProxyHost}");
-                    sb.AppendLine($"systemProp.http.proxyPort={urlTemplate.UserData.ProxyPort}");
-                    sb.AppendLine($"systemProp.http.nonProxyHosts={urlTemplate.UserData.ProxyExceptions}");
-                    sb.AppendLine($"systemProp.https.proxyHost=={urlTemplate.UserData.ProxyHost}");
-                    sb.AppendLine($"systemProp.https.proxyPort={urlTemplate.UserData.ProxyPort}");
-                    sb.AppendLine($"systemProp.https.nonProxyHosts={urlTemplate.UserData.ProxyExceptions}");
+                    sb.AppendLine($"systemProp.http.proxyHost=={urlTemplate.GetHost()}");
+                    sb.AppendLine($"systemProp.http.proxyPort={urlTemplate.GetPort()}");
+                    sb.AppendLine($"systemProp.http.nonProxyHosts={urlTemplate.GetProxyExceptions()}");
+                    sb.AppendLine($"systemProp.https.proxyHost=={urlTemplate.GetHost()}");
+                    sb.AppendLine($"systemProp.https.proxyPort={urlTemplate.GetPort()}");
+                    sb.AppendLine($"systemProp.https.nonProxyHosts={urlTemplate.GetProxyExceptions()}");
 
                     File.WriteAllText(Path.Combine(gradlePath, ".gradle.properties"), sb.ToString());
                 }
@@ -248,11 +290,11 @@ namespace ProxyAtWork
             else
             {
                 logger.Info("Setting control panel");
-                LanSettings.SetProxy(urlTemplate.HttpProxy);
+                LanSettings.SetProxy(urlTemplate.GetProxy(true));
                 LanSettings.ClearExceptions();
-                if (!string.IsNullOrEmpty(urlTemplate.UserData.ProxyExceptions))
+                if (!string.IsNullOrEmpty(urlTemplate.GetProxyExceptions()))
                 {
-                    LanSettings.AddExceptions($"{urlTemplate.UserData.ProxyExceptions}");
+                    LanSettings.AddExceptions($"{urlTemplate.GetProxyExceptions()}");
                 }
                 LanSettings.SetExceptionForLocal(true);
             }
@@ -261,17 +303,23 @@ namespace ProxyAtWork
         private static void ConfigNpm(UrlTemplate urlTemplate)
         {
             // Configure npm
-            if (Msdos.IsInstalled("npm"))
+            if (Msdos.IsInstalled("npm.cmd"))
             {
+                
                 if (urlTemplate.ClearData)
                 {
-                    logger.Warn("Not implemented clearing proxy for npm");
+                    logger.Info("Clearing proxy for npm");
+                    Msdos.Run("npm.cmd", $@"config delete proxy");
+                    Msdos.Run("npm.cmd", $@"config delete https-proxy");
                 }
                 else
                 {
                     logger.Info("Setting proxy for npm");
-                    Msdos.Run("npm", $@"npm config set proxy {urlTemplate.HttpProxy}");
-                    Msdos.Run("npm", $@"npm config set https-proxy {urlTemplate.HttpsProxy}");
+                    Msdos.Run("npm.cmd", $@"config set proxy {urlTemplate.GetProxy()}");
+                    Msdos.Run("npm.cmd", $@"config set https-proxy {urlTemplate.GetProxySsl()}");
+
+                    var npmrc = Path.Combine(Windows.GetCurrentUserFolder(), ".npmrc");
+                    // npmrc file is managed automatically
                 }
             }
         }
@@ -279,18 +327,21 @@ namespace ProxyAtWork
         private static void ConfigNuget(UrlTemplate urlTemplate)
         {
             // Configure nuget
-            if (Msdos.IsInstalled("nuget"))
+            if (Msdos.IsInstalled("nuget.exe"))
             {
                 if (urlTemplate.ClearData)
                 {
-                    logger.Warn("Not implemented clearing proxy for nuget");
+                    logger.Info("Clearing proxy for nuget");
+                    Msdos.Run("nuget.exe", $@"config -set http_proxy=");
+                    Msdos.Run("nuget.exe", $@"config -set http_proxy.user=");
+                    Msdos.Run("nuget.exe", $@"config -set http_proxy.password=");
                 }
                 else
                 {
                     logger.Info("Setting proxy for nuget");
-                    Msdos.Run("nuget", $@"config -set http_proxy={urlTemplate.HttpProxy}");
-                    Msdos.Run("nuget", $@"config -set http_proxy.user={urlTemplate.UserData.ProxyDomain}\{urlTemplate.UserData.ProxyUsername}");
-                    Msdos.Run("nuget", $@"config -set http_proxy.password={urlTemplate.UserData.ProxyPassword}");
+                    Msdos.Run("nuget.exe", $@"config -set http_proxy={urlTemplate.GetProxy(true)}");
+                    Msdos.Run("nuget.exe", $@"config -set http_proxy.user={urlTemplate.GetProxyUsername()}");
+                    Msdos.Run("nuget.exe", $@"config -set http_proxy.password={urlTemplate.GetProxyPassword(true)}");
                 }
             }
         }
@@ -299,12 +350,13 @@ namespace ProxyAtWork
         {
             if (urlTemplate.ClearData)
             {
-                if (!string.IsNullOrEmpty(urlTemplate.HttpProxy))
+                if (!string.IsNullOrEmpty(urlTemplate.GetHost()))
                 {
+                    logger.Info("Clearing proxy windows credentials");
                     using (var credentials = new Credential())
                     {
                         logger.Info("Clearing Windows and Generic credentials");
-                        credentials.Target = urlTemplate.HttpProxy;
+                        credentials.Target = urlTemplate.GetProxy(true);
                         credentials.Delete();
                     }
                 }
@@ -317,9 +369,9 @@ namespace ProxyAtWork
                     using (var credentials = new Credential())
                     {
                         logger.Info("Setting Windows and Generic credentials");
-                        credentials.Password = urlTemplate.UserData.ProxyPassword;
-                        credentials.Target = urlTemplate.HttpProxy;
-                        credentials.Username = urlTemplate.UserData.ProxyUsername;
+                        credentials.Password = urlTemplate.GetProxyPassword();
+                        credentials.Target = urlTemplate.GetProxy(true);
+                        credentials.Username = urlTemplate.GetProxyUsername(true);
                         credentials.PersistanceType = PersistanceType.LocalComputer;
                         credentials.Type = CredentialType.Generic;
                         credentials.Save();
@@ -334,17 +386,19 @@ namespace ProxyAtWork
         private static void ConfigYarn(UrlTemplate urlTemplate)
         {
             // Configure yarn
-            if (Msdos.IsInstalled("yarn"))
+            if (Msdos.IsInstalled("yarn.cmd"))
             {
                 if (urlTemplate.ClearData)
                 {
-                    logger.Warn("Not implemented clearing proxy for yarn");
+                    logger.Info("Clearing proxy for yarn");
+                    Msdos.Run("yarn.cmd", $@"config delete proxy");
+                    Msdos.Run("yarn.cmd", $@"config delete https-proxy");
                 }
                 else
                 {
                     logger.Info("Setting proxy for yarn");
-                    Msdos.Run("yarn", $@"npm config set proxy {urlTemplate.HttpProxyNormalPassword}");
-                    Msdos.Run("yarn", $@"npm config set https-proxy {urlTemplate.HttpsProxyNormalPassword}");
+                    Msdos.Run("yarn.cmd", $@"npm config set proxy {urlTemplate.GetProxy()}");
+                    Msdos.Run("yarn.cmd", $@"npm config set https-proxy {urlTemplate.GetProxySsl()}");
                 }
             }
         }
@@ -364,12 +418,12 @@ namespace ProxyAtWork
         private static string RenderConfigFileGradle(UrlTemplate urlTemplate)
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine($"systemProp.http.proxyHost=={urlTemplate.UserData.ProxyHost}");
-            sb.AppendLine($"systemProp.http.proxyPort={urlTemplate.UserData.ProxyPort}");
-            sb.AppendLine($"systemProp.http.nonProxyHosts={urlTemplate.UserData.ProxyExceptions}");
-            sb.AppendLine($"systemProp.https.proxyHost=={urlTemplate.UserData.ProxyHost}");
-            sb.AppendLine($"systemProp.https.proxyPort={urlTemplate.UserData.ProxyPort}");
-            sb.AppendLine($"systemProp.https.nonProxyHosts={urlTemplate.UserData.ProxyExceptions}");
+            sb.AppendLine($"systemProp.http.proxyHost=={urlTemplate.GetHost()}");
+            sb.AppendLine($"systemProp.http.proxyPort={urlTemplate.GetPort()}");
+            sb.AppendLine($"systemProp.http.nonProxyHosts={urlTemplate.GetProxyExceptions()}");
+            sb.AppendLine($"systemProp.https.proxyHost=={urlTemplate.GetHost()}");
+            sb.AppendLine($"systemProp.https.proxyPort={urlTemplate.GetPort()}");
+            sb.AppendLine($"systemProp.https.nonProxyHosts={urlTemplate.GetProxyExceptions()}");
             return sb.ToString();
         }
     }

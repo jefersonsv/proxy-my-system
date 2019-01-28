@@ -109,6 +109,7 @@ yo
 ## Releases
 
 Get the portable version
+* Version 1.3.1 - https://github.com/jefersonsv/proxy-at-work/releases/tag/1.3.1
 * Version 1.3.0 - https://github.com/jefersonsv/proxy-at-work/releases/tag/1.3.0
 
 ## What's cntlm?
@@ -125,6 +126,5 @@ Apache-2.0 https://github.com/jefersonsv/proxy-at-work/blob/master/LICENSE
 * https://github.com/aloneguid/config
 * https://github.com/Tyrrrz/CliWrap
 * https://github.com/NLog/
-* https://stackoverflow.com/questions/197725/programmatically-set-browser-proxy-settings-in-c-sharp
 * http://credentialmanagement.codeplex.com/
 * http://cntlm.sf.net/
