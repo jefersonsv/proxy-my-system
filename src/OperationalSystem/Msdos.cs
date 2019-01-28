@@ -16,6 +16,7 @@ namespace ProxyAtWork.OperationalSystem
         {
             try
             {
+                logger.Debug($"Find for {app}");
                 Run(app, string.Empty);
                 return true;
             }
