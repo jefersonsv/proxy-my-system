@@ -44,13 +44,13 @@ deploy:
     description: 'Stable version'
     auth_token:
       secure: $(GITHUB_TOKEN_CRYPTED)
-    artifact: /.*\.zip/
+    artifact: **\*.zip
     prerelease: false
     on:
       branch: master
-      IsGithubRelease: true
+#      IsGithubRelease: true
   - provider: NuGet
-    api_key:
+    auth_token:
       secure: $(NUGET_TOKEN_CRYPTED)
     skip_symbols: false
     artifact: /.*\.nupkg/
