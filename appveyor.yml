@@ -19,7 +19,7 @@ dotnet_csproj:
 
 build:
   verbosity: detailed
-  publish_nuget: true
+  publish_nuget: false
  
 before_build:
   - nuget restore
@@ -35,4 +35,4 @@ environment:
     secure: El3Kj0SEU9/+Di2uXiCsTGlDWSjPcqXyO2drOT3XDGOp3rMdIX8zeXOBZLlOCQZw
 
 artifacts:
-  - path: build/ProxyAtWork-v$(appveyor_build_version).zip
+  - path: test.zip
