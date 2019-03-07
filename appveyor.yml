@@ -1,57 +1,14 @@
-image: Visual Studio 2017
-
-branches:
-  only:
-    - master
-
-skip_commits:
-  files:
-    - '**/*.md'
-
-configuration:
-  - Release
-
-dotnet_csproj:
-  patch: true
-  file: '**\*.csproj'
-  version: '{version}'
-  package_version: '{version}'
-  assembly_version: '{version}'
-  file_version: '{version}'
-  informational_version: '{version}'
+version: 1.0.{build}
 
 build:
-  parallel: true
-  verbosity: normal
-  publish_nuget: false
-  publish_wap: true               # package Web Application Projects (WAP) for Web Deploy
-  publish_wap_xcopy: true         # package Web Application Projects (WAP) for XCopy deployment
-  publish_azure: true             # package Azure Cloud Service projects and push to artifacts
-  publish_nuget_symbols: true     # generate and publish NuGet symbol packages
-  include_nuget_references: true  # add -IncludeReferencedProjects option while packaging NuGet ar
- 
-before_build:
-  - nuget restore
- 
-nuget:
-  account_feed: true
-  project_feed: true
- 
-environment:
-  GITHUB_TOKEN_CRYPTED:
-    secure: BI8CvihIl1X5UtJJ4aQn5yyO1v0rgga8iMqK9sZmm7s6qZQG+VNUKa5PDNhQrteN
-  NUGET_TOKEN_CRYPTED:
-    secure: El3Kj0SEU9/+Di2uXiCsTGlDWSjPcqXyO2drOT3XDGOp3rMdIX8zeXOBZLlOCQZw
+  verbosity: minimal
 
 artifacts:
-  - path: '\bin\$(configuration)\*.*'
+- path: /bin
+  name: binaries
 
-  # pushing a single file
-  - path: test.zip
-
-  # pushing a single file with environment variable in path and "Deployment name" specified
-  - path: MyProject\bin\$(configuration)
-    name: myapp
-
-  # pushing entire folder as a zip archive
-  - path: logs
+deploy:
+- provider: GitHub
+  auth_token:
+    secure: 8Cx6MFrE/49EAos6kgdEFHkAUJOPIazE1rwmOg1A0DUZ0D8uklB/3T7ur/2sXtY+JL1SO3o3r7jQeYWRtvnZQnNM6vQHEYe7h6FEk0OfU4o=
+  artifact: vv
