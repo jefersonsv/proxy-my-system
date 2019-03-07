@@ -44,7 +44,7 @@ deploy:
     description: 'Stable version'
     auth_token:
       secure: $(GITHUB_TOKEN_CRYPTED)
-    artifact: **\*.zip
+    artifact: /.*\.zip/
     prerelease: false
     on:
       branch: master
