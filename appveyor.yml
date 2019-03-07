@@ -35,4 +35,6 @@ environment:
     secure: El3Kj0SEU9/+Di2uXiCsTGlDWSjPcqXyO2drOT3XDGOp3rMdIX8zeXOBZLlOCQZw
 
 artifacts:
-  - path: '*.*'
+  paths:
+    - "*/bin"
+    - "*/obj"
