@@ -21,7 +21,7 @@ dotnet_csproj:
   informational_version: '{version}'
 
 build:
-#  verbosity: detailed
+  verbosity: normal
   publish_nuget: false
  
 before_build:
