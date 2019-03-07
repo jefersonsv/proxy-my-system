@@ -1,0 +1,51 @@
+image: Visual Studio 2017
+
+branches:
+  only:
+    - master
+
+skip_commits:
+  files:
+    - '**/*.md'
+
+dotnet_csproj:
+  patch: true
+  file: '**\*.csproj'
+  version: '{version}'
+  package_version: '{version}'
+  assembly_version: '{version}'
+  file_version: '{version}'
+  informational_version: '{version}'
+
+build:
+  verbosity: detailed
+  publish_nuget: true
+ 
+before_build:
+  - nuget restore
+ 
+nuget:
+  account_feed: true
+  project_feed: true
+ 
+environment:
+  GITHUB_TOKEN_CRYPTED:
+    secure: BI8CvihIl1X5UtJJ4aQn5yyO1v0rgga8iMqK9sZmm7s6qZQG+VNUKa5PDNhQrteN
+  NUGET_TOKEN_CRYPTED:
+    secure: El3Kj0SEU9/+Di2uXiCsTGlDWSjPcqXyO2drOT3XDGOp3rMdIX8zeXOBZLlOCQZw
+
+artifacts:
+  - path: ProxyAtWork-v$(appveyor_build_version).zip
+    name: ProxyAtWork
+
+deploy:
+  release: ProxyAtWork-v$(appveyor_build_version)
+  description: 'Stable version'
+  provider: GitHub
+  auth_token:
+    secure: GITHUB_TOKEN_CRYPTED
+  artifact: /.*\.zip/            # upload all NuGet packages to release assets
+  draft: false
+  prerelease: false
+  on:
+    branch: master                 # release from master branch only
