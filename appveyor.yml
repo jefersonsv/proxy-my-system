@@ -18,7 +18,7 @@ dotnet_csproj:
   informational_version: '{version}'
 
 build:
-  verbosity: detailed
+#  verbosity: detailed
   publish_nuget: false
  
 before_build:
@@ -35,4 +35,4 @@ environment:
     secure: El3Kj0SEU9/+Di2uXiCsTGlDWSjPcqXyO2drOT3XDGOp3rMdIX8zeXOBZLlOCQZw
 
 artifacts:
-  - path: "*/bin"
+  - path: "bin"
