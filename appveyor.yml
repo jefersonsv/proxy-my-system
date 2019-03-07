@@ -21,8 +21,14 @@ dotnet_csproj:
   informational_version: '{version}'
 
 build:
+  parallel: true
   verbosity: normal
   publish_nuget: false
+  publish_wap: true               # package Web Application Projects (WAP) for Web Deploy
+  publish_wap_xcopy: true         # package Web Application Projects (WAP) for XCopy deployment
+  publish_azure: true             # package Azure Cloud Service projects and push to artifacts
+  publish_nuget_symbols: true     # generate and publish NuGet symbol packages
+  include_nuget_references: true  # add -IncludeReferencedProjects option while packaging NuGet ar
  
 before_build:
   - nuget restore
@@ -39,3 +45,13 @@ environment:
 
 artifacts:
   - path: '\bin\$(configuration)\*.*'
+
+  # pushing a single file
+  - path: test.zip
+
+  # pushing a single file with environment variable in path and "Deployment name" specified
+  - path: MyProject\bin\$(configuration)
+    name: myapp
+
+  # pushing entire folder as a zip archive
+  - path: logs
