@@ -35,22 +35,4 @@ environment:
     secure: El3Kj0SEU9/+Di2uXiCsTGlDWSjPcqXyO2drOT3XDGOp3rMdIX8zeXOBZLlOCQZw
 
 artifacts:
-  - path: ProxyAtWork-v$(appveyor_build_version).zip
-    name: ProxyAtWork
-
-deploy:
-  - provider: GitHub
-    release: ProxyAtWork-v$(appveyor_build_version)
-    description: 'Stable version'
-    auth_token:
-      secure: $(GITHUB_TOKEN_CRYPTED)
-    artifact: /.*\.zip/
-    prerelease: false
-    on:
-      branch: master
-#      IsGithubRelease: true
-  - provider: NuGet
-    auth_token:
-      secure: $(NUGET_TOKEN_CRYPTED)
-    skip_symbols: false
-    artifact: /.*\.nupkg/
+  - path: build/win_flex_bison*.zip
