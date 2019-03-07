@@ -96,7 +96,11 @@ namespace ProxyAtWork
                 logger.Info("The system has been configured");
             }
 
-            logger.Info("Please, close all instances of Command Prompt or any program that use proxy and open again to reload newest settings");
+            var refreshEnv = Msdos.IsInstalled(@"C:\Windows\DEV\Github\proxy-at-work\src\RefreshEnv.cmd");
+            if (refreshEnv)
+                logger.Info("The environment variables was updated and the new settings were applied.");
+            else
+                logger.Info("Please, close all instances of Command Prompt or any program that use proxy and open again to reload newest settings");
 
             Environment.Exit(0);
         }
@@ -133,26 +137,33 @@ namespace ProxyAtWork
             // Configure bower
             if (Msdos.IsInstalled("bower.cmd"))
             {
+                // bowerrc user file
+                var bowerrc = Path.Combine(Windows.GetCurrentUserFolder(), ".bowerrc");
+
                 if (urlTemplate.ClearData)
                 {
                     logger.Info("Clearing proxy for bower");
                     Msdos.Run("npm.cmd", $@"config delete proxy");
                     Msdos.Run("npm.cmd", $@"config delete https-proxy");
+
+                    if (File.Exists(bowerrc))
+                    {
+                        System.IO.File.Delete(bowerrc);
+                    }
                 }
                 else
                 {
                     logger.Info("Setting proxy for bower");
                     Msdos.Run("npm.cmd", $@"npm config set proxy {urlTemplate.GetProxy()}");
                     Msdos.Run("npm.cmd", $@"npm config set https-proxy {urlTemplate.GetProxySsl()}");
-
-                    // Create bowerrc file
-                    var bowerrc = Path.Combine(Windows.GetCurrentUserFolder(), ".bowerrc");
+                    
                     if (!File.Exists(bowerrc))
                     {
                         // create settings
                         var obj = new JObject();
                         obj.Add("proxy", urlTemplate.GetProxy());
                         obj.Add("https-proxy", urlTemplate.GetProxySsl());
+                        obj.Add("no-proxy", urlTemplate.GetProxyExceptions());
 
                         System.IO.File.WriteAllText(bowerrc, obj.ToString());
                     }
@@ -163,6 +174,7 @@ namespace ProxyAtWork
                         var obj = JObject.Parse(content);
                         obj["proxy"] = urlTemplate.GetProxy();
                         obj["https-proxy"] = urlTemplate.GetProxySsl();
+                        obj["no-proxy"] = urlTemplate.GetProxyExceptions();
 
                         System.IO.File.WriteAllText(bowerrc, obj.ToString());
                     }
@@ -173,7 +185,7 @@ namespace ProxyAtWork
         private static void ConfigChocolatey(UrlTemplate urlTemplate)
         {
             // Configure CHOCOLATEY
-            if (Msdos.IsInstalled("choco.exe"))
+            if (Msdos.IsInstalled("choco.exe", "--version"))
             {
                 if (urlTemplate.ClearData)
                 {
@@ -232,12 +244,13 @@ namespace ProxyAtWork
         private static void ConfigGit(UrlTemplate urlTemplate)
         {
             // Configure GIT
-            if (Msdos.IsInstalled("git.exe"))
+            if (Msdos.IsInstalled("git.exe", "version"))
             {
                 if (urlTemplate.ClearData)
                 {
                     logger.Info("Clearing proxy for GIT");
                     Msdos.Run("git.exe", $"config --global --unset http.proxy");
+                    Msdos.Run("git.exe", $"config --global --unset https.proxy");
                 }
                 else
                 {
@@ -303,7 +316,7 @@ namespace ProxyAtWork
         private static void ConfigNpm(UrlTemplate urlTemplate)
         {
             // Configure npm
-            if (Msdos.IsInstalled("npm.cmd"))
+            if (Msdos.IsInstalled("npm.cmd", "version"))
             {
                 
                 if (urlTemplate.ClearData)
@@ -327,7 +340,7 @@ namespace ProxyAtWork
         private static void ConfigNuget(UrlTemplate urlTemplate)
         {
             // Configure nuget
-            if (Msdos.IsInstalled("nuget.exe"))
+            if (Msdos.IsInstalled("nuget.exe", "help"))
             {
                 if (urlTemplate.ClearData)
                 {

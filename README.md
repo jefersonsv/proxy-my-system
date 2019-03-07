@@ -20,19 +20,18 @@ Configure easily a big list of applications
 * Angular CLI - https://cli.angular.io
 * Yoeman - http://yeoman.io
 * All browsers - https://en.wikipedia.org/wiki/List_of_web_browsers
-* And much more
+* And much more...
 
-## Behavior
+## Others features
 
-> Only the variable **PROXY_HOST** and **PROXY_PORT** are required the others varibles are optional.
-
-> Add Windows and Generic credentials at control panel
-
-> Configure proxy and exceptions at Internet Settings on control panel
-
-> Optionally install an cntlm windows service to relay NTLMv2 authentication on 127.0.0.1:3128 (localhost)
+* Clear all settings options
+* Refresh environment variables to apply new settings running sessions
+* Add Windows and Generic credentials at control panel
+* Configure proxy and exceptions at Internet Settings on control panel
+* Optionally install an cntlm windows service to relay NTLMv2 authentication on 127.0.0.1:3128 (localhost)
 
 > You can use special characters in your password that the application will encode automatically when being necessary.
+> Only the variable **PROXY_HOST** and **PROXY_PORT** are required the others varibles are optional.
 
 ## Future implementation
 * Add Visual studio code user settings
@@ -47,12 +46,17 @@ Configure easily a big list of applications
 * XML configuration files
 
 ### Use with command line argument
-```html
+```bash
 proxy-at-work.exe PROXY_DOMAIN=<type-proxy-host> PROXY_USERNAME=[type-proxy-username] PROXY_PASSWORD=[type-proxy-password] PROXY_HOST=<type-proxy-port> PROXY_EXCEPTIONS=[type-proxy-url-exceptions]
 ```
 
-You can use the example **run.cmd** file to run the application and also create copy of this for differents profiles.
-```html
+To clear all proxy settings
+```bash
+proxy-at-work.exe -c
+```
+
+Use the example **run.cmd** file to run the application and also create copy of this for differents profiles.
+```bash
 run.cmd
 ```
 
@@ -105,7 +109,7 @@ run.cmd
     * PROXY_PORT
     * PROXY_EXCEPTIONS
 3. Run the application `proxy-at-work.exe`
-yo 
+
 ## Releases
 
 Get the portable version

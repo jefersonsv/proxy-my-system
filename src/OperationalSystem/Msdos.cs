@@ -13,12 +13,12 @@ namespace ProxyAtWork.OperationalSystem
     {
         public static readonly NLog.Logger logger = NLog.LogManager.GetCurrentClassLogger();
 
-        public static bool IsInstalled(string app)
+        public static bool IsInstalled(string app, string param = null)
         {
             try
             {
                 logger.Debug($"Find for {app}");
-                Run(app, string.Empty, false);
+                Run(app, param, false);
                 return true;
             }
             catch (System.ComponentModel.Win32Exception ex)
@@ -36,11 +36,9 @@ namespace ProxyAtWork.OperationalSystem
             }
         }
 
-        public static ExecutionOutput Run(string app, string param, bool log = true)
+        public static ExecutionResult Run(string app, string param, bool log = true)
         {
-            
             var paths = Environment.GetEnvironmentVariable("PATH")?.Split(';');
-
 
             foreach (var path in paths)
             {
@@ -49,49 +47,44 @@ namespace ProxyAtWork.OperationalSystem
                 // Execute like a program
                 if (File.Exists(exec))
                 {
-                    var cliSettings = new CliSettings()
+                    var result = Cli.Wrap(Path.GetFileName(exec))
+                        .EnableExitCodeValidation(false)
+                        .SetWorkingDirectory(Path.GetDirectoryName(exec))
+                        .SetArguments(param ?? "")
+                        .Execute();
+
+                    if (log)
                     {
-                        WorkingDirectory = path
-                    };
+                        logger.Debug($"Configure application: {app} in {path}");
 
-                    using (var cli = new Cli(app, cliSettings))
-                    {
-                        var result = cli.Execute(param);
+                        if (!string.IsNullOrEmpty(result.StandardOutput))
+                            logger.Debug(result.StandardOutput);
 
-                        if (log)
-                        {
-                            logger.Debug($"Configure application: {app} in {path}");
-
-                            if (!string.IsNullOrEmpty(result.StandardOutput))
-                                logger.Debug(result.StandardOutput);
-
-                            if (!string.IsNullOrEmpty(result.StandardError))
-                                logger.Error(result.StandardError);
-                        }
-                            
-                        return result;
+                        if (!string.IsNullOrEmpty(result.StandardError))
+                            logger.Error(result.StandardError);
                     }
+                            
+                    return result;
                 }
             }
 
             // Execute like command
-            using (var cli = new Cli(app))
+            var resultCommand = Cli.Wrap(app)
+                .EnableExitCodeValidation(false)
+                .Execute();
+
+            if (log)
             {
-                var result = cli.Execute(param);
+                logger.Debug($"Configure command: {app}");
 
-                if (log)
-                {
-                    logger.Debug($"Configure command: {app}");
+                if (!string.IsNullOrEmpty(resultCommand.StandardOutput))
+                    logger.Debug(resultCommand.StandardOutput);
 
-                    if (!string.IsNullOrEmpty(result.StandardOutput))
-                        logger.Debug(result.StandardOutput);
-
-                    if (!string.IsNullOrEmpty(result.StandardOutput))
-                        logger.Error(result.StandardError);
-                }
-
-                return result;
+                if (!string.IsNullOrEmpty(resultCommand.StandardOutput))
+                    logger.Error(resultCommand.StandardError);
             }
+
+            return resultCommand;
         }
     }
 }
