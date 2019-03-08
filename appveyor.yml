@@ -7,5 +7,5 @@ before_build:
 build:
   verbosity: minimal
 artifacts:
-- path: bin
+- path: src\bin
   name: all
