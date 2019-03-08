@@ -20,7 +20,6 @@ artifacts:
 
 deploy:
 - provider: GitHub
-  release: ProxyMySystem-v$(appveyor_build_version).zip
   auth_token:
     secure: BI8CvihIl1X5UtJJ4aQn5yyO1v0rgga8iMqK9sZmm7s6qZQG+VNUKa5PDNhQrteN
   artifact: ProxyMySystem-v$(appveyor_build_version).zip
