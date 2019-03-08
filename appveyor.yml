@@ -20,7 +20,7 @@ artifacts:
 
 - path: src\bin\$(configuration)
 
-  name: ProxyMySystem-v$(appveyor_build_version)
+  name: ProxyMySystem-v$(appveyor_build_version).zip
 
 deploy:
 
