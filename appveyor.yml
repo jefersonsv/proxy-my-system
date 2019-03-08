@@ -2,8 +2,10 @@ version: 1.5.{build}
 configuration: Release
 
 environment:
-  NUGET_TOKEN_CRYPTED: QuL5btMfw2HUtOrAO0C8hw0ILWLAY9Tq4Gp1uuDiPCjkOt7H8glITwlPCxoB/WWA
-  GITHUB_TOKEN_CRYPTED: BI8CvihIl1X5UtJJ4aQn5yyO1v0rgga8iMqK9sZmm7s6qZQG+VNUKa5PDNhQrteN
+  GITHUB_TOKEN_CRYPTED:
+    secure: BI8CvihIl1X5UtJJ4aQn5yyO1v0rgga8iMqK9sZmm7s6qZQG+VNUKa5PDNhQrteN
+  NUGET_TOKEN_CRYPTED:
+    secure: El3Kj0SEU9/+Di2uXiCsTGlDWSjPcqXyO2drOT3XDGOp3rMdIX8zeXOBZLlOCQZw
 
 before_build:
 - cmd: nuget restore
@@ -18,6 +20,5 @@ artifacts:
 deploy:
 - provider: GitHub
   release: portable-v$(appveyor_build_version)
-  auth_token:
-    secure: $(GITHUB_TOKEN_CRYPTED)
+  auth_token: $(GITHUB_TOKEN_CRYPTED)
   artifact: ProxyMySystem-v$(appveyor_build_version).zip
