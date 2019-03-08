@@ -1,7 +1,6 @@
 version: 1.0.{build}
 configuration: Release
 environment:
-  EnableNuGetPackageRestore: true
   NUGET_TOKEN_CRYPTED: QuL5btMfw2HUtOrAO0C8hw0ILWLAY9Tq4Gp1uuDiPCjkOt7H8glITwlPCxoB/WWA
 build:
   verbosity: minimal
