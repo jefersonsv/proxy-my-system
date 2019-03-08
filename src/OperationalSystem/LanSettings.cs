@@ -14,7 +14,7 @@ namespace ProxyMySystem.OperationalSystem
         public const int INTERNET_OPTION_SETTINGS_CHANGED = 39;
         private static RegistryKey proxyRegistry = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings", true);
 
-        private bool settingsReturn, refreshReturn;
+        //private bool settingsReturn, refreshReturn;
 
         public static void AddExceptions(string exceptionByComma)
         {
