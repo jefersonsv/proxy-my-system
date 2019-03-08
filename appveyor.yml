@@ -18,6 +18,7 @@ environment:
 before_build:
 - cmd: nuget restore
 - ps: gitversion /l console /output buildserver /updateAssemblyInfo
+- cmd: git log 1.1.0...HEAD --pretty=format:"- %h %s" > NOTES.md
 
 build:
   verbosity: minimal
