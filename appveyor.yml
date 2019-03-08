@@ -1,33 +1,22 @@
-version: 1.0.{build}
-
+version: 1.5.{build}
 configuration: Release
 
 environment:
-
   NUGET_TOKEN_CRYPTED: QuL5btMfw2HUtOrAO0C8hw0ILWLAY9Tq4Gp1uuDiPCjkOt7H8glITwlPCxoB/WWA
-
   GITHUB_TOKEN_CRYPTED: BI8CvihIl1X5UtJJ4aQn5yyO1v0rgga8iMqK9sZmm7s6qZQG+VNUKa5PDNhQrteN
 
 before_build:
-
 - cmd: nuget restore
 
 build:
-
   verbosity: minimal
 
 artifacts:
-
 - path: src\bin\$(configuration)
-
-  name: ProxyMySystem-v$(appveyor_build_version).zip
+  name: ProxyMySystem-v$(appveyor_build_version)
 
 deploy:
-
 - provider: GitHub
-
   auth_token:
-
     secure: BI8CvihIl1X5UtJJ4aQn5yyO1v0rgga8iMqK9sZmm7s6qZQG+VNUKa5PDNhQrteN
-
   artifact: ProxyMySystem-v$(appveyor_build_version).zip
