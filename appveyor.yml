@@ -2,7 +2,7 @@ version: 1.0.{build}
 configuration: Release
 
 environment:
-  GITHUB_TOKEN_CRYPTED: 
+  github_token_crypted: 
     secure: BI8CvihIl1X5UtJJ4aQn5yyO1v0rgga8iMqK9sZmm7s6qZQG+VNUKa5PDNhQrteN
   NUGET_TOKEN_CRYPTED:
     secure: El3Kj0SEU9/+Di2uXiCsTGlDWSjPcqXyO2drOT3XDGOp3rMdIX8zeXOBZLlOCQZw
@@ -20,5 +20,5 @@ artifacts:
 deploy:
 - provider: GitHub
   release: portable-v$(appveyor_build_version)
-  auth_token: $GITHUB_TOKEN_CRYPTED
+  auth_token: $(github_token_crypted)
   artifact: ProxyMySystem-v$(appveyor_build_version).zip
