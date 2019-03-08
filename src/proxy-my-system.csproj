@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{DB81D707-E10D-4A98-8937-767C613BE02F}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>ProxyAtWork</RootNamespace>
-    <AssemblyName>ProxyAtWork</AssemblyName>
+    <RootNamespace>ProxyMySystem</RootNamespace>
+    <AssemblyName>ProxyMySystem</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -112,10 +112,10 @@
     <None Include="run.cmd">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="ProxyAtWork.json">
+    <None Include="ProxyMySystem.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="ProxyAtWork.ini">
+    <None Include="ProxyMySystem.ini">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

@@ -1,17 +1,9 @@
 version: 1.0.{build}
-
-before_build:
-  - nuget restore
-
+configuration: Release
+environment:
+  NUGET_TOKEN_CRYPTED: QuL5btMfw2HUtOrAO0C8hw0ILWLAY9Tq4Gp1uuDiPCjkOt7H8glITwlPCxoB/WWA
 build:
   verbosity: minimal
-
 artifacts:
-- path: /bin
-  name: binaries
-
-deploy:
-- provider: GitHub
-  auth_token:
-    secure: 8Cx6MFrE/49EAos6kgdEFHkAUJOPIazE1rwmOg1A0DUZ0D8uklB/3T7ur/2sXtY+JL1SO3o3r7jQeYWRtvnZQnNM6vQHEYe7h6FEk0OfU4o=
-  artifact: vv
+- path: '*.*'
+  name: all

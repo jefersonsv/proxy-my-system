@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProxyAtWork.OperationalSystem
+namespace ProxyMySystem.OperationalSystem
 {
     public static class Msdos
     {

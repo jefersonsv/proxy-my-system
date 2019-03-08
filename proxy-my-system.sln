@@ -8,14 +8,13 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4ED43C67-2588-4374-897D-7F04A5CC8E5B}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
-		.release-it.json = .release-it.json
 		appveyor.yml = appveyor.yml
 		LICENSE = LICENSE
 		no-headache-icon.png = no-headache-icon.png
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "proxy-at-work", "src\proxy-at-work.csproj", "{DB81D707-E10D-4A98-8937-767C613BE02F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "proxy-my-system", "src\proxy-my-system.csproj", "{DB81D707-E10D-4A98-8937-767C613BE02F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

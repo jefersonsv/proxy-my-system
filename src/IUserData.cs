@@ -1,6 +1,6 @@
 ﻿using Config.Net;
 
-namespace ProxyAtWork
+namespace ProxyMySystem
 {
     public interface IUserData
     {

@@ -1,4 +1,4 @@
-﻿namespace ProxyAtWork
+﻿namespace ProxyMySystem
 {
     public class UrlTemplate
     {

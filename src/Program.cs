@@ -2,14 +2,14 @@
 using Config.Net;
 using CredentialManagement;
 using Newtonsoft.Json.Linq;
-using ProxyAtWork.OperationalSystem;
+using ProxyMySystem.OperationalSystem;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace ProxyAtWork
+namespace ProxyMySystem
 {
     public class Program
     {
@@ -37,9 +37,9 @@ namespace ProxyAtWork
                 {
                     logger.Error("You must set user data settings using any bellow methods:");
                     logger.Info("APP ARGUMENTS => aplication arguments");
-                    logger.Info("APP SETTINGS => ProxyAtWork.exe.config");
-                    logger.Info("INI FILE => ProxyAtWork.ini");
-                    logger.Info("JSON FILE => ProxyAtWork.json");
+                    logger.Info("APP SETTINGS => ProxyMySystem.exe.config");
+                    logger.Info("INI FILE => ProxyMySystem.ini");
+                    logger.Info("JSON FILE => ProxyMySystem.json");
                     logger.Info("VARIABLE => environment variables");
                     logger.Info("The most important parameter is: PROXY_HOST then the first data settings that there are this value will be used");
                     Environment.Exit(2);
@@ -421,8 +421,8 @@ namespace ProxyAtWork
             List<IUserData> settings = new List<IUserData>();
             settings.Add(new ConfigurationBuilder<IUserData>().UseCommandLineArgs().Build());
             settings.Add(new ConfigurationBuilder<IUserData>().UseAppConfig().Build());
-            settings.Add(new ConfigurationBuilder<IUserData>().UseIniFile(System.IO.Path.Combine(Environment.CurrentDirectory, "ProxyAtWork.ini")).Build());
-            settings.Add(new ConfigurationBuilder<IUserData>().UseJsonFile(System.IO.Path.Combine(Environment.CurrentDirectory, "ProxyAtWork.json")).Build());
+            settings.Add(new ConfigurationBuilder<IUserData>().UseIniFile(System.IO.Path.Combine(Environment.CurrentDirectory, "ProxyMySystem.ini")).Build());
+            settings.Add(new ConfigurationBuilder<IUserData>().UseJsonFile(System.IO.Path.Combine(Environment.CurrentDirectory, "ProxyMySystem.json")).Build());
             settings.Add(new ConfigurationBuilder<IUserData>().UseEnvironmentVariables().Build());
 
             return settings.FirstOrDefault(w => !string.IsNullOrEmpty(w.ProxyHost));
