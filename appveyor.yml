@@ -3,7 +3,7 @@ configuration: Release
 environment:
   NUGET_TOKEN_CRYPTED: QuL5btMfw2HUtOrAO0C8hw0ILWLAY9Tq4Gp1uuDiPCjkOt7H8glITwlPCxoB/WWA
 build:
-  verbosity: minimal
+  verbosity: verbosity
 artifacts:
 - path: '*.*'
   name: all
