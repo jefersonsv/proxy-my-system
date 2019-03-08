@@ -25,3 +25,6 @@ deploy:
     secure: BI8CvihIl1X5UtJJ4aQn5yyO1v0rgga8iMqK9sZmm7s6qZQG+VNUKa5PDNhQrteN
   artifact: ProxyMySystem-v$(appveyor_build_version).zip
   force_update: false
+  on:
+    branch: master                 # release from master branch only
+    APPVEYOR_REPO_TAG: true        # deploy on tag push only
