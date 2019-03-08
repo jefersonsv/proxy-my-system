@@ -20,6 +20,5 @@ artifacts:
 deploy:
 - provider: GitHub
   release: portable-v$(appveyor_build_version)
-  auth_token:
-    secure: GITHUB_TOKEN_CRYPTED
+  auth_token: GITHUB_TOKEN_CRYPTED
   artifact: ProxyMySystem-v$(appveyor_build_version).zip
