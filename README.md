@@ -113,8 +113,7 @@ run.cmd
 ## Releases
 
 Get the portable version
-* Version 1.3.1 - https://github.com/jefersonsv/proxy-my-system/releases/tag/1.3.1
-* Version 1.3.0 - https://github.com/jefersonsv/proxy-my-system/releases/tag/1.3.0
+* Version 1.5.59 - https://github.com/jefersonsv/proxy-my-system/releases/tag/1.5.59
 
 ## What's cntlm?
 Cntlm is an NTLM / NTLMv2 authenticating HTTP/1.1 proxy. It caches auth'd connections for reuse, offers TCP/IP tunneling (port forwarding) thru parent proxy and much much more. It's in C, very fast and resource-efficient. Go to http://cntlm.sf.net/

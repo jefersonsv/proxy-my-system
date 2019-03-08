@@ -1,6 +1,13 @@
 version: 1.5.{build}
 configuration: Release
 
+skip_commits:
+  files:
+    - '**/*.md'
+
+install:
+  - choco install gitversion.portable -pre -y
+
 environment:
   APPVEYOR_REPO_TAG: true
   GITHUB_TOKEN_CRYPTED: 
@@ -10,6 +17,7 @@ environment:
 
 before_build:
 - cmd: nuget restore
+- ps: gitversion /l console /output buildserver /updateAssemblyInfo
 
 build:
   verbosity: minimal
