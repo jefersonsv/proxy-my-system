@@ -1,4 +1,4 @@
-# Proxy at Work
+# Proxy my System
 
 Configure proxy settings for GIT, npm, chocolatey, yarn, nuget, bower and manny other.
 You can write your proxy data settings like host:port username, password using most common sources.
@@ -47,12 +47,12 @@ Configure easily a big list of applications
 
 ### Use with command line argument
 ```bash
-proxy-at-work.exe PROXY_DOMAIN=<type-proxy-host> PROXY_USERNAME=[type-proxy-username] PROXY_PASSWORD=[type-proxy-password] PROXY_HOST=<type-proxy-port> PROXY_EXCEPTIONS=[type-proxy-url-exceptions]
+proxy-my-system.exe PROXY_DOMAIN=<type-proxy-host> PROXY_USERNAME=[type-proxy-username] PROXY_PASSWORD=[type-proxy-password] PROXY_HOST=<type-proxy-port> PROXY_EXCEPTIONS=[type-proxy-url-exceptions]
 ```
 
 To clear all proxy settings
 ```bash
-proxy-at-work.exe -c
+proxy-my-system.exe -c
 ```
 
 Use the example **run.cmd** file to run the application and also create copy of this for differents profiles.
@@ -74,7 +74,7 @@ run.cmd
     * PROXY_PORT
     * PROXY_EXCEPTIONS
 7. Ok (twice)
-8. Run the application `proxy-at-work.exe`
+8. Run the application `proxy-my-system.exe`
 
 
 ### INI file
@@ -86,7 +86,7 @@ run.cmd
     * PROXY_HOST
     * PROXY_PORT
     * PROXY_EXCEPTIONS
-3. Run the application `proxy-at-work.exe`
+3. Run the application `proxy-my-system.exe`
 
 ### Json file
 1. Open the file settings.json
@@ -97,10 +97,10 @@ run.cmd
     * PROXY_HOST
     * PROXY_PORT
     * PROXY_EXCEPTIONS
-3. Run the application `proxy-at-work.exe`
+3. Run the application `proxy-my-system.exe`
 
 ### XML configuration file
-1. Open the file proxy-at-work.exe.config
+1. Open the file proxy-my-system.exe.config
 2. Fill the follow the variables at appSettings section
     * PROXY_DOMAIN
     * PROXY_USERNAME
@@ -108,13 +108,13 @@ run.cmd
     * PROXY_HOST
     * PROXY_PORT
     * PROXY_EXCEPTIONS
-3. Run the application `proxy-at-work.exe`
+3. Run the application `proxy-my-system.exe`
 
 ## Releases
 
 Get the portable version
-* Version 1.3.1 - https://github.com/jefersonsv/proxy-at-work/releases/tag/1.3.1
-* Version 1.3.0 - https://github.com/jefersonsv/proxy-at-work/releases/tag/1.3.0
+* Version 1.3.1 - https://github.com/jefersonsv/proxy-my-system/releases/tag/1.3.1
+* Version 1.3.0 - https://github.com/jefersonsv/proxy-my-system/releases/tag/1.3.0
 
 ## What's cntlm?
 Cntlm is an NTLM / NTLMv2 authenticating HTTP/1.1 proxy. It caches auth'd connections for reuse, offers TCP/IP tunneling (port forwarding) thru parent proxy and much much more. It's in C, very fast and resource-efficient. Go to http://cntlm.sf.net/
@@ -124,7 +124,7 @@ Cntlm is an NTLM / NTLMv2 authenticating HTTP/1.1 proxy. It caches auth'd connec
 
 ## License
 
-Apache-2.0 https://github.com/jefersonsv/proxy-at-work/blob/master/LICENSE
+Apache-2.0 https://github.com/jefersonsv/proxy-my-system/blob/master/LICENSE
 
 ## Thanks to
 * https://github.com/aloneguid/config
