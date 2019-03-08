@@ -2,6 +2,7 @@ version: 1.0.{build}
 configuration: Release
 
 environment:
+  APPVEYOR_REPO_TAG: true
   GITHUB_TOKEN_CRYPTED: 
     secure: BI8CvihIl1X5UtJJ4aQn5yyO1v0rgga8iMqK9sZmm7s6qZQG+VNUKa5PDNhQrteN
   NUGET_TOKEN_CRYPTED:
@@ -9,7 +10,6 @@ environment:
 
 before_build:
 - cmd: nuget restore
-
 
 build:
   verbosity: minimal
