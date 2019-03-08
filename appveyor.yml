@@ -1,4 +1,4 @@
-version: 1.5.{build}
+version: 1.0.{build}
 configuration: Release
 
 environment:
@@ -20,6 +20,5 @@ artifacts:
 deploy:
 - provider: GitHub
   release: portable-v$(appveyor_build_version)
-  auth_token: 
-    secure: BI8CvihIl1X5UtJJ4aQn5yyO1v0rgga8iMqK9sZmm7s6qZQG+VNUKa5PDNhQrteN
+  auth_token: $(GITHUB_TOKEN_CRYPTED)
   artifact: ProxyMySystem-v$(appveyor_build_version).zip
