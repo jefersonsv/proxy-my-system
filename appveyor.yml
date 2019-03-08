@@ -1,11 +1,21 @@
 version: 1.0.{build}
+
 configuration: Release
+
 environment:
+
   NUGET_TOKEN_CRYPTED: QuL5btMfw2HUtOrAO0C8hw0ILWLAY9Tq4Gp1uuDiPCjkOt7H8glITwlPCxoB/WWA
+
 before_build:
+
 - cmd: nuget restore
+
 build:
+
   verbosity: minimal
+
 artifacts:
-- path: src\bin
-  name: all
+
+- path: src\bin\$(configuration)
+
+  name: ProxyMySystem-v$(appveyor_build_version)
